@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>习惯追踪器 - Habit Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .add-habit-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-habit-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .habits-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .habits-section h2 {
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .habit-item {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid;
+        }
+
+        .habit-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .habit-meta {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .habit-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-complete {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #45a049;
+        }
+
+        .btn-complete.completed {
+            background: #2196F3;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            transition: width 0.3s ease;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+            margin-top: 10px;
+        }
+
+        .calendar-day {
+            width: 25px;
+            height: 25px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .calendar-day.completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state img {
+            width: 80px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 习惯追踪器</h1>
+            <p>培养好习惯，成就更好的自己</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalHabits">0</div>
+                <div class="stat-label">总习惯数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedToday">0</div>
+                <div class="stat-label">今日完成</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="currentStreak">0</div>
+                <div class="stat-label">连续天数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completionRate">0%</div>
+                <div class="stat-label">完成率</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="add-habit-section">
+                <h2>➕ 添加新习惯</h2>
+                <form id="habitForm">
+                    <div class="form-group">
+                        <label for="habitName">习惯名称</label>
+                        <input type="text" id="habitName" placeholder="例如：每天阅读30分钟" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="habitCategory">分类</label>
+                        <select id="habitCategory">
+                            <option value="健康">🏃‍♂️ 健康</option>
+                            <option value="学习">📚 学习</option>
+                            <option value="工作">💼 工作</option>
+                            <option value="生活">🏠 生活</option>
+                            <option value="社交">👥 社交</option>
+                            <option value="娱乐">🎮 娱乐</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>选择颜色</label>
+                        <div class="color-picker">
+                            <div class="color-option selected" data-color="#4CAF50" style="background: #4CAF50"></div>
+                            <div class="color-option" data-color="#2196F3" style="background: #2196F3"></div>
+                            <div class="color-option" data-color="#FF9800" style="background: #FF9800"></div>
+                            <div class="color-option" data-color="#E91E63" style="background: #E91E63"></div>
+                            <div class="color-option" data-color="#9C27B0" style="background: #9C27B0"></div>
+                            <div class="color-option" data-color="#FF5722" style="background: #FF5722"></div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">创建习惯</button>
+                </form>
+            </div>
+
+            <div class="habits-section">
+                <h2>📋 我的习惯</h2>
+                <div id="habitsList">
+                    <div class="empty-state">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🌱</div>
+                        <h3>还没有习惯</h3>
+                        <p>添加你的第一个习惯开始追踪吧！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class HabitTracker {
+            constructor() {
+                this.habits = this.loadHabits();
+                this.selectedColor = '#4CAF50';
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.render();
+                this.updateStats();
+            }
+
+            bindEvents() {
+                // 表单提交
+                document.getElementById('habitForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addHabit();
+                });
+
+                // 颜色选择
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        document.querySelector('.color-option.selected').classList.remove('selected');
+                        e.target.classList.add('selected');
+                        this.selectedColor = e.target.dataset.color;
+                    });
+                });
+            }
+
+            addHabit() {
+                const name = document.getElementById('habitName').value;
+                const category = document.getElementById('habitCategory').value;
+                
+                const habit = {
+                    id: Date.now(),
+                    name,
+                    category,
+                    color: this.selectedColor,
+                    createdAt: new Date().toISOString(),
+                    completions: []
+                };
+
+                this.habits.push(habit);
+                this.saveHabits();
+                this.render();
+                this.updateStats();
+                
+                // 重置表单
+                document.getElementById('habitForm').reset();
+                document.querySelector('.color-option.selected').classList.remove('selected');
+                document.querySelector('.color-option').classList.add('selected');
+                this.selectedColor = '#4CAF50';
+            }
+
+            toggleHabit(habitId) {
+                const habit = this.habits.find(h => h.id === habitId);
+                const today = new Date().toDateString();
+                
+                if (habit.completions.includes(today)) {
+                    habit.completions = habit.completions.filter(date => date !== today);
+                } else {
+                    habit.completions.push(today);
+                }
+                
+                this.saveHabits();
+                this.render();
+                this.updateStats();
+            }
+
+            deleteHabit(habitId) {
+                if (confirm('确定要删除这个习惯吗？')) {
+                    this.habits = this.habits.filter(h => h.id !== habitId);
+                    this.saveHabits();
+                    this.render();
+                    this.updateStats();
+                }
+            }
+
+            getStreakDays(habit) {
+                if (habit.completions.length === 0) return 0;
+                
+                const sortedDates = habit.completions
+                    .map(date => new Date(date))
+                    .sort((a, b) => b - a);
+                
+                let streak = 0;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                for (let i = 0; i < sortedDates.length; i++) {
+                    const date = sortedDates[i];
+                    date.setHours(0, 0, 0, 0);
+                    
+                    const expectedDate = new Date(today);
+                    expectedDate.setDate(today.getDate() - streak);
+                    
+                    if (date.getTime() === expectedDate.getTime()) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                return streak;
+            }
+
+            getCompletionRate(habit) {
+                const daysElapsed = Math.ceil((new Date() - new Date(habit.createdAt)) / (1000 * 60 * 60 * 24));
+                return daysElapsed > 0 ? Math.round((habit.completions.length / daysElapsed) * 100) : 0;
+            }
+
+            createCalendarGrid(habit) {
+                const today = new Date();
+                const daysToShow = 21; // 3周
+                const grid = document.createElement('div');
+                grid.className = 'calendar-grid';
+                
+                for (let i = daysToShow - 1; i >= 0; i--) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() - i);
+                    
+                    const day = document.createElement('div');
+                    day.className = 'calendar-day';
+                    day.textContent = date.getDate();
+                    
+                    if (habit.completions.includes(date.toDateString())) {
+                        day.classList.add('completed');
+                    }
+                    
+                    if (date.toDateString() === today.toDateString()) {
+                        day.classList.add('today');
+                    }
+                    
+                    grid.appendChild(day);
+                }
+                
+                return grid;
+            }
+
+            render() {
+                const habitsList = document.getElementById('habitsList');
+                
+                if (this.habits.length === 0) {
+                    habitsList.innerHTML = `
+                        <div class="empty-state">
+                            <div style="font-size: 4rem; margin-bottom: 20px;">🌱</div>
+                            <h3>还没有习惯</h3>
+                            <p>添加你的第一个习惯开始追踪吧！</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                habitsList.innerHTML = '';
+                
+                this.habits.forEach(habit => {
+                    const today = new Date().toDateString();
+                    const isCompletedToday = habit.completions.includes(today);
+                    const streak = this.getStreakDays(habit);
+                    const completionRate = this.getCompletionRate(habit);
+                    
+                    const habitElement = document.createElement('div');
+                    habitElement.className = 'habit-item';
+                    habitElement.style.borderLeftColor = habit.color;
+                    
+                    habitElement.innerHTML = `
+                        <div class="habit-header">
+                            <div class="habit-info">
+                                <div class="habit-name">${habit.name}</div>
+                                <div class="habit-meta">${habit.category} • 连续${streak}天 • 完成率${completionRate}%</div>
+                            </div>
+                            <div class="habit-actions">
+                                <button class="btn-small btn-complete ${isCompletedToday ? 'completed' : ''}" 
+                                        onclick="habitTracker.toggleHabit(${habit.id})">
+                                    ${isCompletedToday ? '✓ 已完成' : '完成'}
+                                </button>
+                                <button class="btn-small btn-delete" onclick="habitTracker.deleteHabit(${habit.id})">
+                                    删除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${completionRate}%; background: ${habit.color}"></div>
+                        </div>
+                        <div class="calendar-container"></div>
+                    `;
+                    
+                    habitsList.appendChild(habitElement);
+                    
+                    // 添加日历网格
+                    const calendarContainer = habitElement.querySelector('.calendar-container');
+                    calendarContainer.appendChild(this.createCalendarGrid(habit));
+                });
+            }
+
+            updateStats() {
+                const today = new Date().toDateString();
+                const totalHabits = this.habits.length;
+                const completedToday = this.habits.filter(h => h.completions.includes(today)).length;
+                const maxStreak = Math.max(0, ...this.habits.map(h => this.getStreakDays(h)));
+                const avgCompletionRate = totalHabits > 0 
+                    ? Math.round(this.habits.reduce((sum, h) => sum + this.getCompletionRate(h), 0) / totalHabits)
+                    : 0;
+
+                document.getElementById('totalHabits').textContent = totalHabits;
+                document.getElementById('completedToday').textContent = completedToday;
+                document.getElementById('currentStreak').textContent = maxStreak;
+                document.getElementById('completionRate').textContent = avgCompletionRate + '%';
+            }
+
+            saveHabits() {
+                localStorage.setItem('habits', JSON.stringify(this.habits));
+            }
+
+            loadHabits() {
+                const saved = localStorage.getItem('habits');
+                return saved ? JSON.parse(saved) : [];
+            }
+        }
+
+        const habitTracker = new HabitTracker();
+    </script>
+</body>
+</html>
