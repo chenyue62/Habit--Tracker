@@ -62,7 +62,7 @@
         .header p {
             font-size: 1.2rem;
             color: var(--text-secondary);
-            opacity: 0.9;
+            opacity: 0.6;
         }
 
         .stats-grid {
@@ -433,7 +433,7 @@
     <div class="container">
         <div class="header">
             <h1>🎯 习惯追踪器</h1>
-            <p>让好习惯成为日常，而不是偶然</p>
+            <p>养成习惯的过程实际上就是成为你自己的过程</p>
         </div>
 
         <div class="stats-grid">
@@ -496,8 +496,8 @@
                 <h2>📋 我的习惯</h2>
                 <div id="habitsList">
                     <div class="empty-state">
-                        <div style="font-size: 4rem; margin-bottom: 20px;">🌱</div>
-                        <h3>还没有习惯</h3>
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🍃</div>
+                        <h3>还没有记录</h3>
                         <p>添加你的第一个习惯开始追踪吧！</p>
                     </div>
                 </div>
@@ -569,6 +569,7 @@
                     habit.completions = habit.completions.filter(date => date !== today);
                 } else {
                     habit.completions.push(today);
+                    alert(`✅ 已完成今天的「${habit.name}」打卡！`);
                 }
                 
                 this.saveHabits();
@@ -652,9 +653,9 @@
                 if (this.habits.length === 0) {
                     habitsList.innerHTML = `
                         <div class="empty-state">
-                            <div style="font-size: 4rem; margin-bottom: 20px;">🌱</div>
-                            <h3>还没有习惯</h3>
-                            <p>添加你的第一个习惯开始追踪吧！</p>
+                            <div style="font-size: 4rem; margin-bottom: 20px;">🍃</div>
+                            <h3>还没有记录</h3>
+                            <p>添加你的第一个习惯开始追踪吧！⛽️</p>
                         </div>
                     `;
                     return;
@@ -727,6 +728,7 @@
             }
         }
 
+        // 初始化应用
         const habitTracker = new HabitTracker();
     </script>
 </body>
